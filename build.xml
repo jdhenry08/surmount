@@ -1,0 +1,65 @@
+<project name="surmount" default="compile" basedir=".">
+  <property name="java.src"     value="src" />
+  <property name="build.dir"    value="bin" />
+  <property name="docs.dir"     value="doc" />
+  <property name="junit.home"   value="/shared/naps" />
+  <property file="user.properties" />
+  
+  <path id="test.classpath">
+    <pathelement location="${build.dir}" />
+    <pathelement location="${build.dir}/*/" />
+    <pathelement location="form-eval.jar" />
+    <pathelement location="mysql-connector.jar" />
+  	<pathelement location="${junit.home}/junit-4.5.jar" />
+  </path>
+  
+  <target name="init">
+  	<mkdir dir="${build.dir}" />
+  	<mkdir dir="${docs.dir}" />
+  </target>
+  
+  <target name="clean">
+    <delete dir="${build.dir}" />
+    <delete dir="${docs.dir}" />
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${java.src}" destdir="${build.dir}">
+      <classpath refid="test.classpath" />
+      <include name="form-eval.jar" />
+      <include name="mysql-connector.jar" />
+      <include name="*.java" />
+      <include name="**/*.java" />
+    </javac>
+  </target>
+
+  <target name="runnormal" depends="compile">
+    <java classname="Surmount" fork = "yes">
+      <classpath refid="test.classpath" />
+
+    </java> 
+  </target>
+
+  <target name="docs" depends="init">
+    <javadoc destdir="${docs.dir}">
+      <fileset dir="${java.src}" defaultexcludes="yes">
+        <include name="**/*.java"/>
+        <exclude name="**/*Test*.java"/>
+      </fileset>
+    </javadoc>
+  </target>
+		
+ <target name="runtests" depends="compile" >
+  <junit printsummary="yes">
+    <classpath refid="test.classpath" />
+    <formatter type="plain" />
+    <formatter type="xml" />
+				
+	  <batchtest fork="yes" todir="${docs.dir}">
+	    <fileset dir="${build.dir}" >
+	      <include name="**/*Test*.*" />
+	    </fileset>
+	  </batchtest>
+  </junit>
+ </target>
+</project>
